@@ -1,59 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"    
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"    
-xmlns:p="http://www.springframework.org/schema/p"    
-xmlns:context="http://www.springframework.org/schema/context" 
-xmlns:mvc="http://www.springframework.org/schema/mvc"
-xsi:schemaLocation="http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd    
-http://www.springframework.org/schema/context    http://www.springframework.org/schema/context/spring-context-3.0.xsd 
-http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd"
-default-lazy-init="true">
-
-    <!-- 启动事务添加配置 -->
-    <context:component-scan base-package="cn.demo">  
-        <!-- 排除扫描service标签 -->
-        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>   
-    </context:component-scan>  
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/aop   
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd   
+        http://www.springframework.org/schema/beans   
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd   
+        http://www.springframework.org/schema/context   
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd   
+        http://www.springframework.org/schema/mvc   
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd   
+        http://www.springframework.org/schema/tx   
+        http://www.springframework.org/schema/tx/spring-tx-4.3.xsd" >
     
-    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-        <!-- 注册JASON转换器 -->
-        <property name="messageConverters">  
-            <list>  
-                <ref bean="mappingJacksonHttpMessageConverter"/>  
-                <ref bean="utf8StringHttpMessageConverter"/>
-            </list>  
-        </property> 
+    <!-- 1.自动扫描包，实现支持注解的IOC  -->
+    <!-- 自动扫描该包，使springmvc认为包下用了@Controller注解的类是控制器 -->
+    <context:component-scan base-package="cn.demo.controller" /> 
+    
+    <!-- 2.配置注解的处理器映射器和处理器适配器 -->
+    <!-- <mvc:annotation-driven /> 是一种简写形式，完全可以手动配置替代这种简写形式，简写形式可以让初学者
+        快速应用默认配置方案。<mvc:annotation-driven /> 会自动注册DefaultAnnotationHandlerMapping与
+        AnnotationMethodHandlerAdapter 两个bean,是spring MVC为@Controllers分发请求所必须的。 -->
+    <mvc:annotation-driven />
+    
+    <!-- 3.Spring MVC不处理静态资源  -->
+    <mvc:default-servlet-handler/>
+    
+    <!-- 4.配置内部视图解析器 -->
+      <!-- 对模型视图名称的解析,即在模型视图名称添加前后缀 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
     </bean>
     
-    <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
-        <property name="supportedMediaTypes">  
-            <list>  
-                <value>text/plain;charset=UTF-8</value>
-                <value>text/html;charset=UTF-8</value>  
-                <value>application/json;charset=UTF-8</value>
-            </list>  
-        </property>  
-    </bean>  
-    <bean id="utf8StringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter">
-        <property name="supportedMediaTypes">
-            <list>
-                <value>text/plain;charset=UTF-8</value>
-                <value>text/html;charset=UTF-8</value>
-                <value>application/json;charset=UTF-8</value>
-            </list>
-        </property>
+    <!--5.配置文件上传解析器 -->
+    <!--Spring MVC默认不能识别multipart格式的文件内容 -->
+    <bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
     </bean>
-
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
-        <property name="prefix" value="/WEB-INF/jsp/"/>
-        <property name="suffix" value=".jsp"/>
-    </bean>
-
-    <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"></bean>
- 
     
-    <!-- 当配置了<mvc:annotation-driven/>后，会自动加载org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping和
-org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter，所以如果显示的配置则需去掉配置<mvc:annotation-driven/> -->
-    <!--<mvc:annotation-driven/>-->
 </beans>
